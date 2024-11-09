@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "base-conversions",
+	"version": "${version}",
+	"name": "Base Conversions",
+	"description": "Converting between bases has never been this easy! Bring your Minecraft engineering to the next level with just a simple command.",
+	"authors": [
+		"cowdevs!"
+	],
+	"contact": {
+		"homepage": "https://github.com/cowdevs/",
+		"sources": "https://github.com/cowdevs/base-conversions"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/base-conversions/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.cowdevs.baseconversions.BaseConversions"
+		],
+		"fabric-datagen": [
+			"net.cowdevs.baseconversions.BaseConversionsDataGenerator"
+		],
+		"client": [
+			"net.cowdevs.baseconversions.BaseConversionsClient"
+		]
+	},
+	"mixins": [
+		"base-conversions.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.9",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
