@@ -5,13 +5,13 @@
 	"name": "Base Conversions",
 	"description": "Converting between bases has never been this easy! Bring your Minecraft engineering to the next level with just a simple command.",
 	"authors": [
-		"cowdevs!"
+		"cowdevs"
 	],
 	"contact": {
 		"homepage": "https://github.com/cowdevs/",
 		"sources": "https://github.com/cowdevs/base-conversions"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/base-conversions/icon.png",
 	"environment": "*",
 	"entrypoints": {
