@@ -1,0 +1,4 @@
+{
+  "text.config.logical-conversions-config.title": "Logical Conversions Settings",
+  "text.config.logical-conversions-config.option.maxFractionLength": "Decimal Precision"
+}

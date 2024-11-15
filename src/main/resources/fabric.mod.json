@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "base-conversions",
+	"id": "logical-conversions",
 	"version": "${version}",
-	"name": "Base Conversions",
-	"description": "Converting between bases has never been this easy! Bring your Minecraft engineering to the next level with just a simple command.",
+	"name": "Logical Conversions",
+	"description": "Utility commands for various conversions useful in logical redstone.",
 	"authors": [
 		"cowdevs"
 	],
@@ -12,21 +12,21 @@
 		"sources": "https://github.com/cowdevs/base-conversions"
 	},
 	"license": "MIT",
-	"icon": "assets/base-conversions/icon.png",
+	"icon": "assets/logical-conversions/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"net.cowdevs.baseconversions.BaseConversions"
+			"net.cowdevs.logicalconversions.LogicalConversions"
 		],
 		"fabric-datagen": [
-			"net.cowdevs.baseconversions.BaseConversionsDataGenerator"
+			"net.cowdevs.logicalconversions.LogicalConversionsDataGenerator"
 		],
 		"client": [
-			"net.cowdevs.baseconversions.BaseConversionsClient"
+			"net.cowdevs.logicalconversions.LogicalConversionsClient"
 		]
 	},
 	"mixins": [
-		"base-conversions.mixins.json"
+		"logical-conversions.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.16.9",

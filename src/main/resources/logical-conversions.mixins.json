@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "net.cowdevs.baseconversions.mixin",
+	"package": "net.cowdevs.logicalconversions.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"ExampleMixin"

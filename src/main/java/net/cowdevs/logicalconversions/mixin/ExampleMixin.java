@@ -1,4 +1,4 @@
-package net.cowdevs.baseconversions.mixin;
+package net.cowdevs.logicalconversions.mixin;
 
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;

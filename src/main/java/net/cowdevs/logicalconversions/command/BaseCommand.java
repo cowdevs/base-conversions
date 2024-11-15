@@ -1,4 +1,4 @@
-package net.cowdevs.baseconversions.command;
+package net.cowdevs.logicalconversions.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -13,15 +13,12 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.util.Formatting;
 import java.math.BigInteger;
 
-import static net.cowdevs.baseconversions.BaseConversions.CONFIG;
-import static net.cowdevs.baseconversions.BaseConversions.NAME;
+import static net.cowdevs.logicalconversions.LogicalConversions.CONFIG;
+import static net.cowdevs.logicalconversions.LogicalConversions.NAME;
 
-public class ConvertCommand {
+public class BaseCommand {
     private static final int COLOR_CYAN = 0x55ffff;
     private static final int COLOR_GREEN = 0x55ff55;
-    private static final String BASE_ERROR = "Bases must be between 2-36!";
-    private static final String NUMBER_ERROR = "Invalid number format!";
-    private static final String SIZE_ERROR = "Number is too large to handle!";
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("base")
@@ -29,7 +26,7 @@ public class ConvertCommand {
                         .then(CommandManager.argument("number", StringArgumentType.string())
                                 .then(CommandManager.argument("from", IntegerArgumentType.integer())
                                         .then(CommandManager.argument("to", IntegerArgumentType.integer())
-                                                .executes(ConvertCommand::run)
+                                                .executes(BaseCommand::run)
                                         )
                                 )
                         )
@@ -59,22 +56,22 @@ public class ConvertCommand {
     }
 
     private static void validateBase(int from, int to) {
-        if (!(2 <= from && from <= 36 || 2 <= to && to <= 36)) {
-            throw new IllegalArgumentException(BASE_ERROR);
+        if (!(2 <= from && from <= 36 && 2 <= to && to <= 36)) {
+            throw new IllegalArgumentException("Bases must be between 2-36!");
         }
     }
 
     private static void validateNumber(String number, int from) {
         String[] parts = number.split("\\.");
         if (parts.length > 2) {
-            throw new IllegalArgumentException(NUMBER_ERROR);
+            throw new IllegalArgumentException("Invalid number format!");
         }
 
         String validChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".substring(0, from);
         for (String part : parts) {
             for (char c : part.toCharArray()) {
                 if (validChars.indexOf(c) == -1) {
-                    throw new IllegalArgumentException(NUMBER_ERROR);
+                    throw new IllegalArgumentException("Invalid number format!");
                 }
             }
         }
@@ -88,11 +85,11 @@ public class ConvertCommand {
         BigInteger parsedNumber = new BigInteger(integerPart, from);
 
         if (parsedNumber.compareTo(maxLong) > 0) {
-            throw new IllegalArgumentException(SIZE_ERROR);
+            throw new IllegalArgumentException("Number is too large to handle!");
         }
     }
 
-    private static MutableText createResultText(String result, int to) {
+    private static MutableText createResultText(String result, int base) {
         return Text.literal("[")
                 .append(Text.literal(NAME).styled(style -> style
                         .withColor(COLOR_CYAN)
@@ -103,7 +100,7 @@ public class ConvertCommand {
                         .withFormatting(Formatting.UNDERLINE)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, result))
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to Copy to Clipboard")))))
-                .append(" (base" + to + ")");
+                .append(" (base" + base + ")");
     }
 
     public static String convert(String number, int from, int to) {
@@ -111,82 +108,64 @@ public class ConvertCommand {
         String integerPart = parts[0];
         String fractionalPart = parts.length > 1 ? parts[1] : "";
 
-        String convertedIntegerPart = convertIntegerPart(integerPart, from, to);
-        String convertedFractionalPart = convertFractionalPart(fractionalPart, from, to);
+        String convertedIntegerPart = convertInt(integerPart, from, to);
+        String convertedFractionalPart = convertFrac(fractionalPart, from, to);
 
         return convertedFractionalPart.isEmpty() ? convertedIntegerPart : convertedIntegerPart + "." + convertedFractionalPart;
     }
 
-    private static String convertIntegerPart(String number, int from, int to) {
-        long decimal = parseIntegerPart(number, from);
-        return decimal == 0 ? "0" : convertFromDecimal(decimal, to);
-    }
-
-    private static long parseIntegerPart(String number, int base) {
-        long decimal = 0;
+    private static String convertInt(String input, int b1, int b2) {
+        long d = 0;
         long p = 1;
 
-        for (int i = number.length() - 1; i >= 0; i--) {
-            char digitChar = number.charAt(i);
-            int digitValue = Character.isDigit(digitChar) ?
-                             digitChar - '0' :
-                             Character.toUpperCase(digitChar) - 'A' + 10;
-            decimal += digitValue * p;
-            p *= base;
+        for (int i = input.length() - 1; i >= 0; i--) {
+            char digit = input.charAt(i);
+            int value = Character.isDigit(digit) ?
+                    digit - '0' :
+                    Character.toUpperCase(digit) - 'A' + 10;
+            d += value * p;
+            p *= b1;
         }
 
-        return decimal;
-    }
+        StringBuilder output = new StringBuilder();
 
-    private static String convertFromDecimal(long decimal, int base) {
-        StringBuilder convertedNumber = new StringBuilder();
-
-        while (decimal > 0) {
-            int remainder = (int) (decimal % base);
-            char digitChar = (remainder < 10) ?
-                             (char) (remainder + '0') :
-                             (char) (remainder - 10 + 'A');
-            convertedNumber.append(digitChar);
-            decimal /= base;
+        while (d > 0) {
+            int value = (int) (d % b2);
+            char digit = (value < 10) ?
+                    (char) (value + '0') :
+                    (char) (value - 10 + 'A');
+            output.append(digit);
+            d /= b2;
         }
 
-        return convertedNumber.reverse().toString();
+        return output.reverse().toString();
     }
 
-    private static String convertFractionalPart(String number, int from, int to) {
-        double decimal = parseFractionalPart(number, from);
-        return convertFromDecimalFraction(decimal, to);
-    }
+    private static String convertFrac(String input, int b1, int b2) {
+        double d = 0.0;
+        double p = 1.0 / b1;
 
-    private static double parseFractionalPart(String number, int base) {
-        double decimal = 0.0;
-        double p = 1.0 / base;
-
-        for (int i = 0; i < number.length(); i++) {
-            char digitChar = number.charAt(i);
-            int digitValue = Character.isDigit(digitChar) ?
-                             digitChar - '0' :
-                             Character.toUpperCase(digitChar) - 'A' + 10;
-            decimal += digitValue * p;
-            p /= base;
+        for (int i = 0; i < input.length(); i++) {
+            char digit = input.charAt(i);
+            int value = Character.isDigit(digit) ?
+                    digit - '0' :
+                    Character.toUpperCase(digit) - 'A' + 10;
+            d += value * p;
+            p /= b1;
         }
 
-        return decimal;
-    }
+        StringBuilder output = new StringBuilder();
 
-    private static String convertFromDecimalFraction(double decimal, int base) {
-        StringBuilder convertedNumber = new StringBuilder();
-
-            while (decimal > 0 && convertedNumber.length() < CONFIG.maxFractionLength()) {
-            decimal *= base;
-            int digitValue = (int) decimal;
-            char digitChar = (digitValue < 10) ?
-                             (char) (digitValue + '0') :
-                             (char) (digitValue - 10 + 'A');
-            convertedNumber.append(digitChar);
-            decimal -= digitValue;
+        while (d > 0 && output.length() < CONFIG.maxFractionLength()) {
+            d *= b2;
+            int value = (int) d;
+            char digit = (value < 10) ?
+                    (char) (value + '0') :
+                    (char) (value - 10 + 'A');
+            output.append(digit);
+            d -= value;
         }
 
-        return convertedNumber.toString();
+        return output.toString();
     }
 }
